@@ -146,91 +146,6 @@ local lockBtn  = makeButton("🔓", 45)
 local themeBtn = makeButton("🌙", 95) -- default start order: 🌙 -> ☀️ -> 🌈
 local buttons  = {lockBtn, themeBtn}
 
--- Toggle Button (center top)
-local toggleBtn = Instance.new("TextButton", ScreenGui)
-toggleBtn.Size = UDim2.new(0,40,0,40)
-toggleBtn.Position = UDim2.new(0.5, -20, 0, 10)
-toggleBtn.BackgroundColor3 = Color3.fromRGB(0,0,0)
-toggleBtn.BackgroundTransparency = 0.4
-toggleBtn.Text = "🟢"
-toggleBtn.TextColor3 = Color3.fromRGB(0,255,0)
-toggleBtn.Font = Enum.Font.SourceSansBold
-Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(1,0)
-
--- ===== UI Scaling (buttons + emojis + text only) =====
--- Medium scaling: PC ~= 0.8, Mobile ~= 1.3. Does NOT save scale to autosave.
-do
-local function getDeviceScale()
--- Detection: prefer touch-only as mobile. If mixed, use neutral 1.0
-local touch = UIS.TouchEnabled
-local mouse = UIS.MouseEnabled
-if touch and not mouse then
-return 1.3 -- mobile
-elseif mouse and not touch then
-return 0.8 -- pc
-else
--- Mixed (touch + mouse) or unknown -> safe middle
--- Use viewport size heuristics: very small screens probably mobile
-local vs = workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize
-if vs then
-local minSide = math.min(vs.X, vs.Y)
-if minSide <= 600 then
-return 1.3
-elseif minSide >= 1200 then
-return 0.8
-end
-end
-return 1.0
-end
-end
-
-local function applyScale(scale)  
-    -- scale targets: each button, toggleBtn, and the main text labels (title + stats)  
-    local targets = {}  
-    for _, b in ipairs(buttons) do table.insert(targets, b) end  
-    table.insert(targets, toggleBtn)  
-    table.insert(targets, titleLabel)  
-    table.insert(targets, pingLabel)  
-    table.insert(targets, playersLabel)  
-    table.insert(targets, fpsLabel)  
-
-    for _, obj in ipairs(targets) do  
-        if obj and obj.Parent then  
-            local s = obj:FindFirstChild("NeoZUIScale")  
-            if not s then  
-                s = Instance.new("UIScale")  
-                s.Name = "NeoZUIScale"  
-                s.Parent = obj  
-            end  
-            if s.Scale ~= scale then  
-                s.Scale = scale  
-            end  
-        end  
-    end  
-end  
-
--- initial apply  
-local currentScale = getDeviceScale()  
-applyScale(currentScale)  
-
--- Listen for changes in input devices (when available)  
--- Use pcall in case those events are not present on some executors  
-pcall(function()  
-    if UIS:GetPropertyChangedSignal then  
-        UIS:GetPropertyChangedSignal("TouchEnabled"):Connect(function()  
-            local s = getDeviceScale()  
-            if s ~= currentScale then currentScale = s; applyScale(s) end  
-        end)  
-        UIS:GetPropertyChangedSignal("MouseEnabled"):Connect(function()  
-            local s = getDeviceScale()  
-            if s ~= currentScale then currentScale = s; applyScale(s) end  
-        end)  
-    end  
-end)
-
-end
--- ===== End UI Scaling =====
-
 -- Lock state
 local locked = false
 lockBtn.MouseButton1Click:Connect(function()
@@ -258,6 +173,17 @@ end
 end
 pcall(saveNow)
 end)
+
+-- Toggle Button (center top)
+local toggleBtn = Instance.new("TextButton", ScreenGui)
+toggleBtn.Size = UDim2.new(0,40,0,40)
+toggleBtn.Position = UDim2.new(0.5, -20, 0, 10)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(0,0,0)
+toggleBtn.BackgroundTransparency = 0.4
+toggleBtn.Text = "🟢"
+toggleBtn.TextColor3 = Color3.fromRGB(0,255,0)
+toggleBtn.Font = Enum.Font.SourceSansBold
+Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(1,0)
 
 local hudVisible = true
 local function setToggleAppearance()
@@ -291,21 +217,21 @@ container.BorderSizePixel = 0
 local corner = Instance.new("UICorner", container)
 corner.CornerRadius = UDim.new(0,10)
 
-local stroke = Instance.new("UIStroke", container)  
-stroke.Thickness = 1.5  
-stroke.Transparency = 0.45  
-stroke.Color = Color3.fromRGB(0,255,170)  
+local stroke = Instance.new("UIStroke", container)
+stroke.Thickness = 1.5
+stroke.Transparency = 0.45
+stroke.Color = Color3.fromRGB(0,255,170)
 
-local label = Instance.new("TextLabel", container)  
-label.Size = UDim2.new(1, -16, 1, -8)  
-label.Position = UDim2.new(0, 8, 0, 4)  
-label.BackgroundTransparency = 1  
-label.TextColor3 = Color3.fromRGB(200, 255, 200)  
-label.Font = Enum.Font.SourceSansBold  
-label.TextScaled = true  
-label.TextWrapped = true  
-label.Text = text  
-label.TextTransparency = 1  
+local label = Instance.new("TextLabel", container)
+label.Size = UDim2.new(1, -16, 1, -8)
+label.Position = UDim2.new(0, 8, 0, 4)
+label.BackgroundTransparency = 1
+label.TextColor3 = Color3.fromRGB(200, 255, 200)
+label.Font = Enum.Font.SourceSansBold
+label.TextScaled = true
+label.TextWrapped = true
+label.Text = text
+label.TextTransparency = 1
 
 return container, label, stroke
 
@@ -316,28 +242,28 @@ duration = duration or 3
 local wFrame, wLabel = makeModernNotif(welcomeText)
 local aFrame, aLabel = makeModernNotif(autosaveText)
 
-wLabel.Text = welcomeText  
-aLabel.Text = autosaveText  
+wLabel.Text = welcomeText
+aLabel.Text = autosaveText
 
-wFrame.Position = UDim2.new(0.5, 0, 0.12, -36)  
-aFrame.Position = UDim2.new(0.5, 0, 0.12, 10)  
+wFrame.Position = UDim2.new(0.5, 0, 0.12, -36)
+aFrame.Position = UDim2.new(0.5, 0, 0.12, 10)
 
-local tweenInInfo = TweenInfo.new(0.28, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)  
-TweenService:Create(wFrame, tweenInInfo, {BackgroundTransparency = 0.18, Position = UDim2.new(0.5, 0, 0.12, 0)}):Play()  
-TweenService:Create(wLabel, tweenInInfo, {TextTransparency = 0}):Play()  
-TweenService:Create(aFrame, tweenInInfo, {BackgroundTransparency = 0.18, Position = UDim2.new(0.5, 0, 0.12, 46)}):Play()  
-TweenService:Create(aLabel, tweenInInfo, {TextTransparency = 0}):Play()  
+local tweenInInfo = TweenInfo.new(0.28, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+TweenService:Create(wFrame, tweenInInfo, {BackgroundTransparency = 0.18, Position = UDim2.new(0.5, 0, 0.12, 0)}):Play()
+TweenService:Create(wLabel, tweenInInfo, {TextTransparency = 0}):Play()
+TweenService:Create(aFrame, tweenInInfo, {BackgroundTransparency = 0.18, Position = UDim2.new(0.5, 0, 0.12, 46)}):Play()
+TweenService:Create(aLabel, tweenInInfo, {TextTransparency = 0}):Play()
 
-task.spawn(function()  
-    task.wait(duration)  
-    local tweenOutInfo = TweenInfo.new(0.28, Enum.EasingStyle.Quad, Enum.EasingDirection.In)  
-    TweenService:Create(wFrame, tweenOutInfo, {BackgroundTransparency = 1, Position = UDim2.new(0.5, 0, 0.12, -36)}):Play()  
-    TweenService:Create(wLabel, tweenOutInfo, {TextTransparency = 1}):Play()  
-    TweenService:Create(aFrame, tweenOutInfo, {BackgroundTransparency = 1, Position = UDim2.new(0.5, 0, 0.12, 10)}):Play()  
-    TweenService:Create(aLabel, tweenOutInfo, {TextTransparency = 1}):Play()  
-    task.wait(0.35)  
-    if wFrame and wFrame.Parent then wFrame:Destroy() end  
-    if aFrame and aFrame.Parent then aFrame:Destroy() end  
+task.spawn(function()
+task.wait(duration)
+local tweenOutInfo = TweenInfo.new(0.28, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+TweenService:Create(wFrame, tweenOutInfo, {BackgroundTransparency = 1, Position = UDim2.new(0.5, 0, 0.12, -36)}):Play()
+TweenService:Create(wLabel, tweenOutInfo, {TextTransparency = 1}):Play()
+TweenService:Create(aFrame, tweenOutInfo, {BackgroundTransparency = 1, Position = UDim2.new(0.5, 0, 0.12, 10)}):Play()
+TweenService:Create(aLabel, tweenOutInfo, {TextTransparency = 1}):Play()
+task.wait(0.35)
+if wFrame and wFrame.Parent then wFrame:Destroy() end
+if aFrame and aFrame.Parent then aFrame:Destroy() end
 end)
 
 end
@@ -447,86 +373,86 @@ local dragging, dragInput, dragStart, frameStart = false, nil, nil, nil
 local btnDragging, btnDragStart, btnStartOffsets = false, nil, {}
 local toggleDragging, toggleDragStart, toggleStartPos = false, nil, nil
 
-for i, btn in ipairs(buttons) do btnStartOffsets[i] = btn.Position end  
+for i, btn in ipairs(buttons) do btnStartOffsets[i] = btn.Position end
 
-Frame.InputBegan:Connect(function(input)  
-    if locked then return end  
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then  
-        dragging = true  
-        dragStart = input.Position  
-        frameStart = Frame.Position  
-        input.Changed:Connect(function()  
-            if input.UserInputState == Enum.UserInputState.End then  
-                dragging = false  
-                pcall(saveNow)  
-            end  
-        end)  
-    end  
-end)  
+Frame.InputBegan:Connect(function(input)
+if locked then return end
+if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+dragging = true
+dragStart = input.Position
+frameStart = Frame.Position
+input.Changed:Connect(function()
+if input.UserInputState == Enum.UserInputState.End then
+dragging = false
+pcall(saveNow)
+end
+end)
+end
+end)
 
-Frame.InputChanged:Connect(function(input)  
-    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then  
-        dragInput = input  
-    end  
-end)  
+Frame.InputChanged:Connect(function(input)
+if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+dragInput = input
+end
+end)
 
-local function startBtnDrag(input)  
-    if locked then return end  
-    if not (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then return end  
-    btnDragging = true  
-    btnDragStart = input.Position  
-    for i, btn in ipairs(buttons) do btnStartOffsets[i] = btn.Position end  
-    input.Changed:Connect(function()  
-        if input.UserInputState == Enum.UserInputState.End then  
-            btnDragging = false  
-            pcall(saveNow)  
-        end  
-    end)  
-end  
+local function startBtnDrag(input)
+if locked then return end
+if not (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then return end
+btnDragging = true
+btnDragStart = input.Position
+for i, btn in ipairs(buttons) do btnStartOffsets[i] = btn.Position end
+input.Changed:Connect(function()
+if input.UserInputState == Enum.UserInputState.End then
+btnDragging = false
+pcall(saveNow)
+end
+end)
+end
 
-for _, btn in ipairs(buttons) do  
-    btn.InputBegan:Connect(startBtnDrag)  
-    btn.InputChanged:Connect(function(input)  
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then  
-            dragInput = input  
-        end  
-    end)  
-end  
+for _, btn in ipairs(buttons) do
+btn.InputBegan:Connect(startBtnDrag)
+btn.InputChanged:Connect(function(input)
+if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+dragInput = input
+end
+end)
+end
 
-toggleBtn.InputBegan:Connect(function(input)  
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then  
-        toggleDragging = true  
-        toggleDragStart = input.Position  
-        toggleStartPos = toggleBtn.Position  
-        input.Changed:Connect(function()  
-            if input.UserInputState == Enum.UserInputState.End then  
-                toggleDragging = false  
-                pcall(saveNow)  
-            end  
-        end)  
-    end  
-end)  
-toggleBtn.InputChanged:Connect(function(input)  
-    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then  
-        dragInput = input  
-    end  
-end)  
+toggleBtn.InputBegan:Connect(function(input)
+if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+toggleDragging = true
+toggleDragStart = input.Position
+toggleStartPos = toggleBtn.Position
+input.Changed:Connect(function()
+if input.UserInputState == Enum.UserInputState.End then
+toggleDragging = false
+pcall(saveNow)
+end
+end)
+end
+end)
+toggleBtn.InputChanged:Connect(function(input)
+if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+dragInput = input
+end
+end)
 
-UIS.InputChanged:Connect(function(input)  
-    if input ~= dragInput then return end  
-    if dragging and not locked then  
-        local delta = input.Position - dragStart  
-        Frame.Position = UDim2.new(frameStart.X.Scale, frameStart.X.Offset + delta.X, frameStart.Y.Scale, frameStart.Y.Offset + delta.Y)  
-    elseif btnDragging and not locked then  
-        local delta = input.Position - btnDragStart  
-        for i, btn in ipairs(buttons) do  
-            local startPos = btnStartOffsets[i]  
-            btn.Position = UDim2.new(0, startPos.X.Offset + delta.X, 0, startPos.Y.Offset + delta.Y)  
-        end  
-    elseif toggleDragging then  
-        local delta = input.Position - toggleDragStart  
-        toggleBtn.Position = UDim2.new(toggleStartPos.X.Scale, toggleStartPos.X.Offset + delta.X, toggleStartPos.Y.Scale, toggleStartPos.Y.Offset + delta.Y)  
-    end  
+UIS.InputChanged:Connect(function(input)
+if input ~= dragInput then return end
+if dragging and not locked then
+local delta = input.Position - dragStart
+Frame.Position = UDim2.new(frameStart.X.Scale, frameStart.X.Offset + delta.X, frameStart.Y.Scale, frameStart.Y.Offset + delta.Y)
+elseif btnDragging and not locked then
+local delta = input.Position - btnDragStart
+for i, btn in ipairs(buttons) do
+local startPos = btnStartOffsets[i]
+btn.Position = UDim2.new(0, startPos.X.Offset + delta.X, 0, startPos.Y.Offset + delta.Y)
+end
+elseif toggleDragging then
+local delta = input.Position - toggleDragStart
+toggleBtn.Position = UDim2.new(toggleStartPos.X.Scale, toggleStartPos.X.Offset + delta.X, toggleStartPos.Y.Scale, toggleStartPos.Y.Offset + delta.Y)
+end
 end)
 
 end
@@ -534,7 +460,6 @@ end
 -- ===== Lightweight Rainbow palette (unchanged feel, optimized) =====
 local LIGHT_RAINBOW = {}
 for i = 0, 11 do LIGHT_RAINBOW[i + 1] = Color3.fromHSV(i/12, 0.72, 0.95) end
-local LIGHT_RAINBOW_N = #LIGHT_RAINBOW
 local rainbowIndex = 1
 local rainbowAcc = 0
 
@@ -550,77 +475,80 @@ RunService.Heartbeat:Connect(function(dt)
 statAccum = statAccum + dt
 rainbowAcc = rainbowAcc + dt
 
-if statAccum >= STATS_INTERVAL then  
-    statAccum = statAccum - STATS_INTERVAL  
+if statAccum >= STATS_INTERVAL then
+statAccum = statAccum - STATS_INTERVAL
 
-    -- compute fps once  
-    local fps = last_dt > 0 and math.floor(1/last_dt + 0.5) or 0  
-    local fpsTag = fps >= 60 and "[Excellent]" or fps >= 45 and "[Good]" or fps >= 30 and "[Medium]" or "[Low]"  
-    fpsLabel.Text = ("FPS: %d %s"):format(fps, fpsTag)  
+-- compute fps once    
+local fps = last_dt > 0 and math.floor(1/last_dt + 0.5) or 0    
+local fpsTag = fps >= 60 and "[Excellent]" or fps >= 45 and "[Good]" or fps >= 30 and "[Medium]" or "[Low]"    
+fpsLabel.Text = ("FPS: %d %s"):format(fps, fpsTag)    
 
-      -- ping: try-safe but minimal pcall
-        local ok, pingStr = pcall(function()
-            if Stats.Network and Stats.Network.ServerStatsItem then
-                local pingObj = Stats.Network.ServerStatsItem:FindFirstChild("Data Ping")
-                if pingObj then return pingObj:GetValueString() end
-            end
-            return nil
-        end)
-        if ok and type(pingStr) == "string" then
-            local ms = tonumber(pingStr:match("%d+")) or 0
-            local pingTag = ms <= 130 and "[Excellent]" or ms <= 250 and "[Good]" or ms <= 400 and "[Medium]" or "[Low]"
-            pingLabel.Text = ("Ping: %dms %s"):format(ms, pingTag)
-        end
-    end
+-- ping: try-safe but minimal pcall    
+local ok, pingStr = pcall(function()    
+    if Stats.Network and Stats.Network.ServerStatsItem then    
+        local pingObj = Stats.Network.ServerStatsItem:FindFirstChild("Data Ping")    
+        if pingObj then return pingObj:GetValueString() end    
+    end    
+    return nil    
+end)    
+if ok and type(pingStr) == "string" then    
+    local ms = tonumber(pingStr:match("%d+")) or 0    
+    local pingTag = ms <= 130 and "[Excellent]" or ms <= 250 and "[Good]" or ms <= 400 and "[Medium]" or "[Low]"    
+    pingLabel.Text = ("Ping: %dms %s"):format(ms, pingTag)    
+end
 
-    if rainbowEnabled and hudVisible then
-        if rainbowAcc >= 0.9 then
-            rainbowAcc = rainbowAcc - 0.9
-            rainbowIndex = (rainbowIndex % LIGHT_RAINBOW_N) + 1
-            local col = LIGHT_RAINBOW[rainbowIndex]
-            Frame.BackgroundColor3 = col
-            titleLabel.TextColor3 = col
-            pingLabel.TextColor3 = col
-            playersLabel.TextColor3 = col
-            fpsLabel.TextColor3 = col
-        end
-    end
+end
+
+if rainbowEnabled and hudVisible then
+if rainbowAcc >= 0.9 then
+rainbowAcc = rainbowAcc - 0.9
+rainbowIndex = (rainbowIndex % #LIGHT_RAINBOW) + 1
+local col = LIGHT_RAINBOW[rainbowIndex]
+Frame.BackgroundColor3 = col
+titleLabel.TextColor3 = col
+pingLabel.TextColor3 = col
+playersLabel.TextColor3 = col
+fpsLabel.TextColor3 = col
+end
+end
+
 end)
 
 -- ===== Safe-once performance tweaks (FPS booster) =====
 if FPS_BOOST then
-    pcall(function()
-        -- Terrain: keep safe adjustments only
-        local Terrain = Workspace:FindFirstChildOfClass("Terrain")
-        if Terrain then
-            -- subtle water performance tweak
-            pcall(function() Terrain.WaterWaveSize = 0 end)
-            pcall(function() Terrain.WaterTransparency = 1 end)
-        end
+pcall(function()
+-- Terrain: keep safe adjustments only
+local Terrain = Workspace:FindFirstChildOfClass("Terrain")
+if Terrain then
+-- subtle water performance tweak
+if pcall(function() Terrain.WaterWaveSize = 0 end) then end
+if pcall(function() Terrain.WaterTransparency = 1 end) then end
+end
 
-        -- Lighting conservative tweaks (non-destructive)
-        if Lighting then
-            pcall(function()
-                Lighting.GlobalShadows = false
-                Lighting.Outlines = false
-                Lighting.EnvironmentDiffuseScale = 0
-                Lighting.EnvironmentSpecularScale = 0
-            end)
+-- Lighting conservative tweaks (non-destructive)
+if Lighting then
+pcall(function()
+Lighting.GlobalShadows = false
+Lighting.Outlines = false
+Lighting.EnvironmentDiffuseScale = 0
+Lighting.EnvironmentSpecularScale = 0
+end)
 
-            -- Remove heavy effects ONLY if they exist (safe)
-            for _, eff in ipairs({"Bloom", "DepthOfField", "SunRays", "ColorCorrection", "Blur"}) do
-                local e = Lighting:FindFirstChildOfClass(eff)
-                if e then
-                    pcall(function() e.Enabled = false end)
-                end
-            end
-        end
+-- Remove heavy effects ONLY if they exist (safe)  
+        for _, eff in ipairs({"Bloom", "DepthOfField", "SunRays", "ColorCorrection", "Blur"}) do  
+            local e = Lighting:FindFirstChildOfClass(eff)  
+            if e then  
+                pcall(function() e.Enabled = false end)  
+            end  
+        end  
+    end  
 
-        -- Reduce debris lifetime (lighter)
-        pcall(function()
-            Debris.MaxItems = 200
-        end)
-    end)
+    -- Reduce debris lifetime (lighter)  
+    pcall(function()  
+        Debris.MaxItems = 200  
+    end)  
+end)
+
 end
 
 -- Done
