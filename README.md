@@ -1,2 +1,2 @@
 # ZO Vortex Hub
-Fastest &amp; cleanest floating HUD 2025
+Fastest &amp; cleanest floating HUD 2026
